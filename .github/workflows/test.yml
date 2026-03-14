@@ -1,0 +1,12 @@
+name: WSL Runner Testi
+on: [push] # Kod her değiştiğinde çalışır
+
+jobs:
+  merhaba-dunya:
+    runs-on: self-hosted # Senin bilgisayarını hedefler
+    steps:
+      - name: Selam Ver
+        run: echo "Selam! Bu komut senin bilgisayarındaki WSL üzerinde calisiyor."
+      
+      - name: Tarih Kontrolü
+        run: date
