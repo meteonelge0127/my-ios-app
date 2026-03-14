@@ -1,0 +1,44 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      # 1. Repo’yu çek
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. iOS bağımlılıklarını yükle (CocoaPods varsa)
+      - name: Install Dependencies
+        run: |
+          brew install cocoapods || true
+          pod install --project-directory=ios || true
+
+      # 3. Xcode ile archive (IPA üretmek için)
+      - name: Build IPA
+        run: |
+          xcodebuild -workspace ios/App.xcworkspace \
+                     -scheme App \
+                     -configuration Release \
+                     -archivePath build/App.xcarchive archive
+
+      # 4. IPA export
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+                     -archivePath build/App.xcarchive \
+                     -exportOptionsPlist ios/exportOptions.plist \
+                     -exportPath build
+
+      # 5. IPA’yı GitHub’a yükle
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/*.ipa
